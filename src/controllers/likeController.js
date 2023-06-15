@@ -18,9 +18,14 @@ const like = async (req, res) => {
             date_like: new Date().toDateString()
         };
 
-        let isExist = await models.like_res.findOne({
-            
+        let isExisted = await models.like_res.findOne({
+            where: {
+                res_id,
+                user_id
+            }
         })
+
+        if (isExisted) throw "Người dùng này đã like rồi"
 
         // INSERT INTO food VALUES ()
         await models.like_res.create(newData);
