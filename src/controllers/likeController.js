@@ -79,46 +79,68 @@ const removeLike = async (req, res) => {
     }
 }
 
-const getLikesByRestaurants = async (req, res) => {
-    let { page, pageSize, res_id } = req.params;
-    
-    if (!page) { page = 1 }
-    if (!pageSize) { pageSize = 10 }
+const getLikesByRestaurant = async (req, res) => {
+    try {
+        let { res_id } = req.params;
+        let { page, pageSize } = req.query;
 
-    let index = (page - 1) * pageSize;
+        if (!page) { page = 1 }
+        if (!pageSize) { pageSize = 10 }
 
-    let data = await models.restaurant.findAll({
-        where: {
-            res_id
-        },
-        include: ["like_res"],
-        // group: "res_id",
-        // attributes: ["res_id", [sequelize.fn("COUNT", sequelize.col("res_id")), "CountLikes"]],
-        offset: index,
-        limit: Number(pageSize)
-    })
+        let index = (page - 1) * pageSize;
 
-    successCode(res, data, "Truy xuất thành công")
+        let data = await models.restaurant.findAll({
+            where: {
+                res_id
+            },
+            include: ["like_res"],
+            // group: "res_id",
+            // attributes: ["res_id", [sequelize.fn("COUNT", sequelize.col("res_id")), "CountLikes"]],
+            offset: index,
+            limit: Number(pageSize)
+        })
+
+        if (data.length === 0) {
+            throw "Nhà hàng không tồn tại"
+        }
+
+        successCode(res, data, "Truy xuất thành công")
+    } catch (error) {
+        errorCode(res, error)
+    }
 }
 
-const getLikesByUsers = async (req, res) => {
-    let { page, pageSize } = req.params;
+const getLikesByUser = async (req, res) => {
+    try {
+        let { user_id } = req.params;
+        let { page, pageSize } = req.query;
 
-    if (!page) { page = 1 }
-    if (!pageSize) { pageSize = 10 }
+        if (!page) { page = 1 }
+        if (!pageSize) { pageSize = 10 }
 
-    let index = (page - 1) * pageSize;
+        let index = (page - 1) * pageSize;
 
-    let data = await models.like_res.findAll({
-        include: ["user"],
-        // group: "res_id",
-        // attributes: ["res_id", [sequelize.fn("COUNT", sequelize.col("res_id")), "CountLikes"]],
-        offset: index,
-        limit: Number(pageSize)
-    })
+        let data = await models.users.findAll({
+            where: {
+                user_id
+            },
+            include: ["like_res"],
+            // group: "res_id",
+            // attributes: ["res_id", [sequelize.fn("COUNT", sequelize.col("res_id")), "CountLikes"]],
+            offset: index,
+            limit: Number(pageSize)
+        })
 
-    successCode(res, data, "Truy xuất thành công")
+        if (data.length === 0) {
+            throw "Người dùng không tồn tại"
+        }
+
+        successCode(res, data, "Truy xuất thành công")
+    }
+    catch (error) {
+        errorCode(res, error)
+    }
 }
 
-export { getLikesByRestaurants, like, removeLike };
+export { getLikesByRestaurant, getLikesByUser, like, removeLike };
 
