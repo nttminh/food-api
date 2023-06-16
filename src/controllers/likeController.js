@@ -36,38 +36,40 @@ const like = async (req, res) => {
     }
 }
 // Update
-const updateNguoiDung = async (req, res) => {
-    try {
-        let { user_id } = req.params;
-        // client data request body
-        let { full_name, email, pass_word, } = req.body;
+// const updateNguoiDung = async (req, res) => {
+//     try {
+//         let { user_id } = req.params;
+//         // client data request body
+//         let { full_name, email, pass_word, } = req.body;
 
-        await models.user.update({
-            full_name,
-            email,
-            pass_word,
-        }, { where: { user_id } })
-        res.status(200).send("Cập nhật thành công")
-    } catch {
-        res.status(500).send("Lỗi BE")
-    }
+//         await models.user.update({
+//             full_name,
+//             email,
+//             pass_word,
+//         }, { where: { user_id } })
+//         res.status(200).send("Cập nhật thành công")
+//     } catch {
+//         res.status(500).send("Lỗi BE")
+//     }
 
-}
+// }
 // Delete
-const removeNguoiDung = async (req, res) => {
+const removeLike = async (req, res) => {
     try {
 
-        let { user_id } = req.params;
-        // check tồn tại
-        // [{},{},{}]
-        // {}
-        let checkFood = await models.user.findAll({ where: { user_id } });
-        if (checkFood.length > 0) {
+        let { user_id, res_id } = req.params;
+        console.log(user_id, res_id)
+
+        let checkLikes = await models.like_res.findAll({ where: { user_id, res_id } });
+
+        console.log(checkLikes)
+
+        if (checkLikes.length > 0) {
             // DELETE FROM food WHERE user_id = 12;
-            await models.user.destroy({ where: { user_id } })
-            res.status(200).send("Xóa thành công")
+            await models.like_res.destroy({ where: { user_id, res_id } })
+            res.status(200).send("Xóa like thành công")
         } else {
-            res.status(404).send("Item không tồn tại")
+            res.status(404).send("Người dùng chưa từng like nhà hàng này")
         }
 
 
@@ -77,11 +79,21 @@ const removeNguoiDung = async (req, res) => {
     }
 }
 
-const getUserPage = async (req, res) => {
-    let { page, pageSize } = req.params;
+const getLikesByRestaurants = async (req, res) => {
+    let { page, pageSize, res_id } = req.params;
+    
+    if (!page) { page = 1 }
+    if (!pageSize) { pageSize = 10 }
+
     let index = (page - 1) * pageSize;
 
-    let data = await models.users.findAll({
+    let data = await models.restaurant.findAll({
+        where: {
+            res_id
+        },
+        include: ["like_res"],
+        // group: "res_id",
+        // attributes: ["res_id", [sequelize.fn("COUNT", sequelize.col("res_id")), "CountLikes"]],
         offset: index,
         limit: Number(pageSize)
     })
@@ -89,5 +101,24 @@ const getUserPage = async (req, res) => {
     successCode(res, data, "Truy xuất thành công")
 }
 
-export { getUserPage, like, removeNguoiDung, updateNguoiDung };
+const getLikesByUsers = async (req, res) => {
+    let { page, pageSize } = req.params;
+
+    if (!page) { page = 1 }
+    if (!pageSize) { pageSize = 10 }
+
+    let index = (page - 1) * pageSize;
+
+    let data = await models.like_res.findAll({
+        include: ["user"],
+        // group: "res_id",
+        // attributes: ["res_id", [sequelize.fn("COUNT", sequelize.col("res_id")), "CountLikes"]],
+        offset: index,
+        limit: Number(pageSize)
+    })
+
+    successCode(res, data, "Truy xuất thành công")
+}
+
+export { getLikesByRestaurants, like, removeLike };
 
