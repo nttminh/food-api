@@ -8,6 +8,7 @@ const rootRouter = express.Router();
 
 rootRouter.use("/user", userRouter)
 rootRouter.use("/product", productRouter)
+
 rootRouter.use("/like", likeRouter)
 rootRouter.use("/rate", rateRouter)
 

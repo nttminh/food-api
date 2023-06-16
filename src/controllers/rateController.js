@@ -31,49 +31,6 @@ const createRating = async (req, res) => {
         errorCode(res, err)
     }
 }
-// Update
-// const updateNguoiDung = async (req, res) => {
-//     try {
-//         let { user_id } = req.params;
-//         // client data request body
-//         let { full_name, email, pass_word, } = req.body;
-
-//         await models.user.update({
-//             full_name,
-//             email,
-//             pass_word,
-//         }, { where: { user_id } })
-//         res.status(200).send("Cập nhật thành công")
-//     } catch {
-//         res.status(500).send("Lỗi BE")
-//     }
-
-// }
-// Delete
-const removeLike = async (req, res) => {
-    try {
-
-        let { user_id, res_id } = req.params;
-        console.log(user_id, res_id)
-
-        let checkLikes = await models.like_res.findAll({ where: { user_id, res_id } });
-
-        console.log(checkLikes)
-
-        if (checkLikes.length > 0) {
-            // DELETE FROM food WHERE user_id = 12;
-            await models.like_res.destroy({ where: { user_id, res_id } })
-            res.status(200).send("Xóa like thành công")
-        } else {
-            res.status(404).send("Người dùng chưa từng like nhà hàng này")
-        }
-
-
-    }
-    catch {
-        res.status(500).send("Lỗi BE")
-    }
-}
 
 const getRatesByRestaurant = async (req, res) => {
     try {
@@ -104,7 +61,7 @@ const getRatesByRestaurant = async (req, res) => {
     }
 }
 
-const getLikesByUser = async (req, res) => {
+const getRatesByUser = async (req, res) => {
     try {
         let { user_id } = req.params;
         let { page, pageSize } = req.query;
@@ -118,9 +75,7 @@ const getLikesByUser = async (req, res) => {
             where: {
                 user_id
             },
-            include: ["like_res"],
-            // group: "res_id",
-            // attributes: ["res_id", [sequelize.fn("COUNT", sequelize.col("res_id")), "CountLikes"]],
+            include: ["rate_res"],
             offset: index,
             limit: Number(pageSize)
         })
@@ -136,5 +91,5 @@ const getLikesByUser = async (req, res) => {
     }
 }
 
-export { createRating, getRatesByRestaurant, getLikesByUser, removeLike };
+export { createRating, getRatesByRestaurant, getRatesByUser };
 
