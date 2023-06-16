@@ -75,7 +75,7 @@ const removeLike = async (req, res) => {
     }
 }
 
-const getLikesByRestaurant = async (req, res) => {
+const getRatesByRestaurant = async (req, res) => {
     try {
         let { res_id } = req.params;
         let { page, pageSize } = req.query;
@@ -89,9 +89,7 @@ const getLikesByRestaurant = async (req, res) => {
             where: {
                 res_id
             },
-            include: ["like_res"],
-            // group: "res_id",
-            // attributes: ["res_id", [sequelize.fn("COUNT", sequelize.col("res_id")), "CountLikes"]],
+            include: ["rate_res"],
             offset: index,
             limit: Number(pageSize)
         })
@@ -138,5 +136,5 @@ const getLikesByUser = async (req, res) => {
     }
 }
 
-export { createRating, getLikesByUser, removeLike };
+export { createRating, getRatesByRestaurant, getLikesByUser, removeLike };
 
