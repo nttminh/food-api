@@ -1,5 +1,5 @@
 
-import { getLikesByRestaurant, like, removeLike, getLikesByUser } from "../controllers/likeController.js";
+import { getLikesByRestaurant, getLikesByUser, like, removeLike } from "../controllers/likeController.js";
 
 import express from 'express';
 
